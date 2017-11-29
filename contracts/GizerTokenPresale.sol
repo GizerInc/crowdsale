@@ -11,11 +11,11 @@ pragma solidity ^0.4.17;
 
 // ----------------------------------------------------------------------------
 //
-// SafeMath (div not needed but kept for completeness' sake)
+// SafeM (div not needed but kept for completeness' sake)
 //
 // ----------------------------------------------------------------------------
 
-library SafeMath {
+library SafeM {
 
   function add(uint a, uint b) public pure returns (uint c) {
     c = a + b;
@@ -118,7 +118,7 @@ contract ERC20Interface {
 
 contract ERC20Token is ERC20Interface, Owned {
   
-  using SafeMath for uint;
+  using SafeM for uint;
 
   uint public tokensIssuedTotal = 0;
   mapping(address => uint) balances;
