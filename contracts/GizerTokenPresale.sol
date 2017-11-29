@@ -221,11 +221,11 @@ contract GizerTokenPresale is ERC20Token {
   /* General crowdsale parameters */  
   
   uint public constant MIN_CONTRIBUTION = 1 ether / 10; // 0.1 Ether
-  uint public constant MAX_CONTRIBUTION = 100 ether;
+  uint public constant MAX_CONTRIBUTION = 2300 ether;
   
   /* Private sale */
 
-  uint public constant PRIVATE_SALE_MAX_ETHER = 2300 ether;
+  uint public constant PRIVATE_SALE_MAX_ETHER = 1000 ether;
   
   /* Presale parameters */
   
