@@ -230,7 +230,7 @@ contract GizerTokenPresale is ERC20Token {
   /* Presale parameters */
   
   uint public constant DATE_PRESALE_START = 1512050400; // 30-Nov-2017 14:00 UTC
-  uint public constant DATE_PRESALE_END   = 1513260000; // 14-Dec-2017 14:00 UTC
+  uint public constant DATE_PRESALE_END   = 1512914400; // 10-Dec-2017 14:00 UTC
   
   uint public constant TOKETH_PRESALE_ONE   = 1150 * E6; // presale wave 1 (  1-100)
   uint public constant TOKETH_PRESALE_TWO   = 1100 * E6; // presale wave 2 (101-500)
