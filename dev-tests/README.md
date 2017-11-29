@@ -1,5 +1,13 @@
 # GZR development tests
 
+These test were done with GizerToken.sol [53b27da] which is now deprecated.
+
+The contract actually used for the presale is GizerTokenPresale.sol [f87711b].
+
+There will be a new contract for the ICO.
+
+## Test details
+
 1 - Basic tests: wallet change, whitelist and ICO date change functions
 
 2 - Crowdsale fail
