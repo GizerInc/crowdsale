@@ -78,7 +78,7 @@ contract Owned {
   function acceptOwnership() public {
     require( msg.sender == newOwner );
     owner = newOwner;
-	OwnershipTransferred(owner);
+    OwnershipTransferred(owner);
   }
 
 }
@@ -241,6 +241,8 @@ contract GizerToken is ERC20Token {
   uint public tokensIssuedCrowd = 0;
   uint public tokensIssuedOwner = 0;
   
+  uint public etherReceived = 0;
+  
   // Events ---------------------------
   
   event WalletUpdated(address _newWallet);
@@ -257,6 +259,7 @@ contract GizerToken is ERC20Token {
   function GizerToken() public {
     require( TOKEN_SUPPLY_TOTAL + TOKEN_SUPPLY_CROWD == TOKEN_SUPPLY_TOTAL );
     wallet = owner;
+	adminWallet = owner;
     redemptionWallet = owner;
   }
 
@@ -287,7 +290,7 @@ contract GizerToken is ERC20Token {
 
   function setEthCents(uint _cents) public onlyOwner {
     require( msg.sender == adminWallet );
-	require( _cents > 0 );
+    require( _cents > 0 );
     ethCents = _cents;
     EthCentsUpdated(_cents);
   }
@@ -319,13 +322,13 @@ contract GizerToken is ERC20Token {
   /* Minting of tokens by owner */
 
   function mintTokens(address _account, uint _tokens) public onlyOwner {
-	// check amount
+    // check amount
     require( _tokens <= TOKEN_SUPPLY_OWNER.sub(tokensIssuedOwner) );
     
     // update
     balances[_account] = balances[_account].add(_tokens);
     tokensIssuedOwner  = tokensIssuedOwner.add(_tokens);
-	tokensIssuedTotal  = tokensIssuedTotal.add(_tokens);
+    tokensIssuedTotal  = tokensIssuedTotal.add(_tokens);
     
     // log event
     Transfer(0x0, _account, _tokens);
@@ -344,22 +347,28 @@ contract GizerToken is ERC20Token {
 
   function buyTokens() private {
     
-	// basic checks
-	require( atNow() >= DATE_ICO_START && atNow() <= DATE_ICO_END );
-	require( msg.value >= MIN_CONTRIBUTION );
-	
-	// tokens
-	uint tokensAvailable = TOKEN_SUPPLY_CROWD.sub(tokensIssuedCrowd);
-	uint tokens = ethCents.mul(msg.value) / CENTS_PER_TOKEN / E6 / E6;
-	require( tokens <= tokensAvailable);
-	
+    // basic checks
+    require( atNow() >= DATE_ICO_START && atNow() <= DATE_ICO_END );
+    require( msg.value >= MIN_CONTRIBUTION );
+    
+    // check token volume
+    uint tokensAvailable = TOKEN_SUPPLY_CROWD.sub(tokensIssuedCrowd);
+    uint tokens = ethCents.mul(msg.value) / CENTS_PER_TOKEN / E6 / E6;
+    require( tokens <= tokensAvailable );
+    
     // issue tokens
     balances[msg.sender] = balances[msg.sender].add(tokens);
     tokensIssuedCrowd  = tokensIssuedCrowd.add(tokens);
-	tokensIssuedTotal  = tokensIssuedTotal.add(tokens);
+    tokensIssuedTotal  = tokensIssuedTotal.add(tokens);
+	
+	// add to Ether received
+	etherReceived = etherReceived.add(msg.value);
     
+    // transfer Ether out
+    if (this.balance > 0) wallet.transfer(this.balance);
+
     // log token issuance
-	TokensIssuedCrowd(msg.sender, tokens, msg.value);
+    TokensIssuedCrowd(msg.sender, tokens, msg.value);
     Transfer(0x0, msg.sender, tokens);
   }
 
