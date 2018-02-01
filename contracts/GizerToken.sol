@@ -293,8 +293,8 @@ contract GizerToken is ERC20Token {
   
   /* set ETH/US$ cents exchange rate */
 
-  function setEthCents(uint _cents) public onlyOwner {
-    require( msg.sender == adminWallet );
+  function setEthCents(uint _cents) public {
+    require( msg.sender == owner || msg.sender == adminWallet );
     require( _cents > 0 );
     ethCents = _cents;
     EthCentsUpdated(_cents);
