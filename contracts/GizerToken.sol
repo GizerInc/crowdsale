@@ -17,22 +17,22 @@ pragma solidity ^0.4.19;
 
 library SafeM {
 
-  function add(uint a, uint b) public pure returns (uint c) {
+  function add(uint a, uint b) internal pure returns (uint c) {
     c = a + b;
     require( c >= a );
   }
 
-  function sub(uint a, uint b) public pure returns (uint c) {
+  function sub(uint a, uint b) internal pure returns (uint c) {
     require( b <= a );
     c = a - b;
   }
 
-  function mul(uint a, uint b) public pure returns (uint c) {
+  function mul(uint a, uint b) internal pure returns (uint c) {
     c = a * b;
     require( a == 0 || c / a == b );
   }
 
-  function div(uint a, uint b) public pure returns (uint c) {
+  function div(uint a, uint b) internal pure returns (uint c) {
     c = a / b;
   }  
 
@@ -327,8 +327,13 @@ contract GizerToken is ERC20Token {
   /* Minting of tokens by owner */
 
   function mintTokens(address _account, uint _tokens) public onlyOwner {
-    // check amount
-    require( _tokens <= TOKEN_SUPPLY_OWNER.sub(tokensIssuedOwner) );
+    // check available amount
+    uint availableAmount = TOKEN_SUPPLY_OWNER.sub(tokensIssuedOwner);
+	if (atNow() > DATE_ICO_END) {
+	  uint unsoldTokens = TOKEN_SUPPLY_CROWD.sub(tokensIssuedCrowd);
+	  availableAmount = availableAmount.add(unsoldTokens);
+	}
+	require( _tokens <= availableAmount );
     
     // update
     balances[_account] = balances[_account].add(_tokens);
@@ -353,7 +358,7 @@ contract GizerToken is ERC20Token {
   function buyTokens() private {
     
     // basic checks
-    require( atNow() >= DATE_ICO_START && atNow() <= DATE_ICO_END );
+    require( atNow() > DATE_ICO_START && atNow() < DATE_ICO_END );
     require( msg.value >= MIN_CONTRIBUTION );
     
     // check token volume
