@@ -22,7 +22,7 @@ contract GizerTokenTest is GizerToken {
 
   function GizerTokenTest() public {}
 
-  function atNow() public constant returns (uint) {
+  function atNow() public view returns (uint) {
       return testTime;
   }
 

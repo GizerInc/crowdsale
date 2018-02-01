@@ -278,15 +278,25 @@ contract GizerToken is ERC20Token {
   
   /* What time is it? */
   
-  function atNow() public constant returns (uint) {
+  function atNow() public view returns (uint) {
     return now;
   }
 
   /* Are tokens tradeable */
   
-  function tradeable() public constant returns (bool){
+  function tradeable() public view returns (bool) {
     if (atNow() > DATE_ICO_END) return true ;
     return false;
+  }
+  
+  /* Available to mint by owner */
+  
+  function availableToMint() public view returns (uint available) {
+    if (atNow() <= DATE_ICO_END) {
+      available = TOKEN_SUPPLY_OWNER.sub(tokensIssuedOwner);
+    } else {
+      available = TOKEN_SUPPLY_TOTAL.sub(tokensIssuedTotal);
+    }
   }
 
   // Owner Functions ------------------
@@ -327,13 +337,8 @@ contract GizerToken is ERC20Token {
   /* Minting of tokens by owner */
 
   function mintTokens(address _account, uint _tokens) public onlyOwner {
-    // check available amount
-    uint availableAmount = TOKEN_SUPPLY_OWNER.sub(tokensIssuedOwner);
-    if (atNow() > DATE_ICO_END) {
-      uint unsoldTokens = TOKEN_SUPPLY_CROWD.sub(tokensIssuedCrowd);
-      availableAmount = availableAmount.add(unsoldTokens);
-    }
-    require( _tokens <= availableAmount );
+    // check token amount
+    require( _tokens <= availableToMint() );
     
     // update
     balances[_account] = balances[_account].add(_tokens);
