@@ -257,7 +257,7 @@ contract GizerToken is ERC20Token {
   /* Initialize */
 
   function GizerToken() public {
-    require( TOKEN_SUPPLY_TOTAL + TOKEN_SUPPLY_CROWD == TOKEN_SUPPLY_TOTAL );
+    require( TOKEN_SUPPLY_OWNER + TOKEN_SUPPLY_CROWD == TOKEN_SUPPLY_TOTAL );
     wallet = owner;
 	adminWallet = owner;
     redemptionWallet = owner;
