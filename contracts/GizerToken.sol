@@ -329,11 +329,11 @@ contract GizerToken is ERC20Token {
   function mintTokens(address _account, uint _tokens) public onlyOwner {
     // check available amount
     uint availableAmount = TOKEN_SUPPLY_OWNER.sub(tokensIssuedOwner);
-	if (atNow() > DATE_ICO_END) {
-	  uint unsoldTokens = TOKEN_SUPPLY_CROWD.sub(tokensIssuedCrowd);
-	  availableAmount = availableAmount.add(unsoldTokens);
-	}
-	require( _tokens <= availableAmount );
+    if (atNow() > DATE_ICO_END) {
+      uint unsoldTokens = TOKEN_SUPPLY_CROWD.sub(tokensIssuedCrowd);
+      availableAmount = availableAmount.add(unsoldTokens);
+    }
+    require( _tokens <= availableAmount );
     
     // update
     balances[_account] = balances[_account].add(_tokens);
