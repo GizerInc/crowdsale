@@ -1,4 +1,4 @@
-pragma solidity ^0.4.17;
+pragma solidity ^0.4.19;
 
 // ----------------------------------------------------------------------------
 //
@@ -72,7 +72,7 @@ contract Owned {
     require( _newOwner != owner );
     require( _newOwner != address(0x0) );
     newOwner = _newOwner;
-	OwnershipTransferProposed(owner, _newOwner);
+    OwnershipTransferProposed(owner, _newOwner);
   }
 
   function acceptOwnership() public {
@@ -242,6 +242,11 @@ contract GizerToken is ERC20Token {
   uint public tokensIssuedOwner = 0;
   
   uint public etherReceived = 0;
+
+  /* Keep track of Ether contributed and tokens received during Crowdsale */
+  
+  mapping(address => uint) public etherContributed;
+  mapping(address => uint) public tokensReceived;
   
   // Events ---------------------------
   
@@ -259,7 +264,7 @@ contract GizerToken is ERC20Token {
   function GizerToken() public {
     require( TOKEN_SUPPLY_OWNER + TOKEN_SUPPLY_CROWD == TOKEN_SUPPLY_TOTAL );
     wallet = owner;
-	adminWallet = owner;
+    adminWallet = owner;
     redemptionWallet = owner;
   }
 
@@ -358,11 +363,15 @@ contract GizerToken is ERC20Token {
     
     // issue tokens
     balances[msg.sender] = balances[msg.sender].add(tokens);
+    
+    // update global tracking variables
     tokensIssuedCrowd  = tokensIssuedCrowd.add(tokens);
     tokensIssuedTotal  = tokensIssuedTotal.add(tokens);
-	
-	// add to Ether received
-	etherReceived = etherReceived.add(msg.value);
+    etherReceived      = etherReceived.add(msg.value);
+    
+    // update contributor tracking variables
+    etherContributed[msg.sender] = etherContributed[msg.sender].add(msg.value);
+    tokensReceived[msg.sender]   = tokensReceived[msg.sender].add(tokens);
     
     // transfer Ether out
     if (this.balance > 0) wallet.transfer(this.balance);
