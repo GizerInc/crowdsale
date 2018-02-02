@@ -11,11 +11,11 @@ pragma solidity ^0.4.19;
 
 // ----------------------------------------------------------------------------
 //
-// SafeM (div not needed but kept for completeness' sake)
+// SafeMath (division not needed)
 //
 // ----------------------------------------------------------------------------
 
-library SafeM {
+library SafeMath {
 
   function add(uint a, uint b) internal pure returns (uint c) {
     c = a + b;
@@ -31,10 +31,6 @@ library SafeM {
     c = a * b;
     require( a == 0 || c / a == b );
   }
-
-  function div(uint a, uint b) internal pure returns (uint c) {
-    c = a / b;
-  }  
 
 }
 
@@ -118,7 +114,7 @@ contract ERC20Interface {
 
 contract ERC20Token is ERC20Interface, Owned {
   
-  using SafeM for uint;
+  using SafeMath for uint;
 
   uint public tokensIssuedTotal = 0;
   mapping(address => uint) balances;
