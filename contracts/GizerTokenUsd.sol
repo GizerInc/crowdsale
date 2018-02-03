@@ -226,11 +226,11 @@ contract GizerToken is ERC20Token {
 
   uint public constant MIN_CONTRIBUTION = 1 ether / 100;  
   
-  uint public constant CENTS_PER_TOKEN = 100; // US$ 1.25 per token
+  uint public constant CENTS_PER_TOKEN = 125; // US$ 1.25 per token
   
   /* Crowdsale parameters (can be modified by owner) */
 
-  uint public ethCents = 100000; // initial value, can be modified
+  uint public ethCents = 111500; // initial value, can be modified
   
   /* Crowdsale variables */
 
@@ -299,8 +299,7 @@ contract GizerToken is ERC20Token {
   
   /* set ETH/US$ cents exchange rate */
 
-  function setEthCents(uint _cents) private {
-    // set to private so it cannot be called
+  function setEthCents(uint _cents) public {
     require( msg.sender == owner || msg.sender == adminWallet );
     require( _cents > 0 );
     ethCents = _cents;
