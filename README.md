@@ -1,13 +1,11 @@
-# Gizer Gaming Token
+# Gizer Token
 
-Gizer's Tokens (GZR) are scarce building blocks in the Gizer ecosystem for users to customize and advance their profile and brand while creating better user experience on the network.
+The GZR token represents a building block to a user’s profile on the Ethereum network. Each token represents an unlockable profile item in an "unknown" state. The user can unlock tokens at any time, resulting in a randomized profile item being unlocked which can be applied to the user’s Global Gaming Identity. The rarity and type of the item is completely random and decided only after the user decides to unlock it.
+
+Users can collect items for rank, statistics, and customize their avatars to gain prestige within the community. As our network grows, we will encourage game developers and other applications to leverage our Global Gaming Identity.
 
 For more information, visit https://tokensale.gizer.io/
 
-# Sale
-
-Gizer's Presale will be held on November 30 at 14:00 UTC.
-This is a separate smart contract from Gizer's public sale offering.
 
 ## Audit
 
