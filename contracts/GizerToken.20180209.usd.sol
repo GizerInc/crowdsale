@@ -212,23 +212,25 @@ contract GizerToken is ERC20Token {
   /* Wallets */
   
   address public wallet;
+  address public adminWallet;
   address public redemptionWallet;
 
   /* Crowdsale parameters (constants) */
 
-  uint public DATE_ICO_START = 1517580000; // 02-Feb-2018 14:00 UTC 09:00 EST ???
-  uint public DATE_ICO_END   = 1519826400; // 28-Feb-2010 14:00 UTC 09:00 EST ???
+  uint public DATE_ICO_START = 1517580000; // 02-Feb-2018 14:00 UTC 09:00 EST
+  uint public DATE_ICO_END   = 1519826400; // 28-Feb-2010 14:00 UTC 09:00 EST
 
-  uint public constant TOKEN_SUPPLY_TOTAL = 10000000 * E6;
-  uint public constant TOKEN_SUPPLY_CROWD =  6285888 * E6;
-  uint public constant TOKEN_SUPPLY_OWNER =  3714112 * E6; //  2,000,000 tokens reserve
-                                                           //  1,714,112 presale tokens
+  uint public constant TOKEN_SUPPLY_TOTAL = 10000000 * E6; // 20,000,000 tokens
+  uint public constant TOKEN_SUPPLY_OWNER =  2000000 * E6; //  5,714,112 tokens
+  uint public constant TOKEN_SUPPLY_CROWD =  8000000 * E6; // 14,285,888 tokens  
 
   uint public constant MIN_CONTRIBUTION = 1 ether / 100;  
   
-  uint public constant TOKENS_PER_ETH = 1000;
+  uint public constant CENTS_PER_TOKEN = 100; // US$ 1.25 per token
   
-  uint public constant DATE_TOKENS_UNLOCKED = 1519826400; // ???
+  /* Crowdsale parameters (can be modified by owner) */
+
+  uint public ethCents = 100000; // initial value, can be modified
   
   /* Crowdsale variables */
 
@@ -237,21 +239,19 @@ contract GizerToken is ERC20Token {
   
   uint public etherReceived = 0;
 
-  /* Keep track of + Ether contributed,
-                   + tokens received 
-                   + tokens locked during Crowdsale */
+  /* Keep track of Ether contributed and tokens received during Crowdsale */
   
   mapping(address => uint) public etherContributed;
   mapping(address => uint) public tokensReceived;
-  mapping(address => uint) public locked;
   
   // Events ---------------------------
   
   event WalletUpdated(address _newWallet);
+  event AdminWalletUpdated(address _newAdminWallet);
   event RedemptionWalletUpdated(address _newRedemptionWallet);
   event EthCentsUpdated(uint _cents);
   event TokensIssuedCrowd(address indexed _recipient, uint _tokens, uint _ether);
-  event TokensIssuedOwner(address indexed _recipient, uint _tokens, bool _locked);
+  event TokensIssuedOwner(address indexed _recipient, uint _tokens);
 
   // Basic Functions ------------------
 
@@ -260,6 +260,7 @@ contract GizerToken is ERC20Token {
   function GizerToken() public {
     require( TOKEN_SUPPLY_OWNER + TOKEN_SUPPLY_CROWD == TOKEN_SUPPLY_TOTAL );
     wallet = owner;
+    adminWallet = owner;
     redemptionWallet = owner;
   }
 
@@ -293,18 +294,18 @@ contract GizerToken is ERC20Token {
       available = TOKEN_SUPPLY_TOTAL.sub(tokensIssuedTotal);
     }
   }
-  
-  /* Unlocked tokens in an account */
-  
-  function unlockedTokens(address _account) public view returns (uint _unlockedTokens) {
-    if (atNow() <= DATE_TOKENS_UNLOCKED) {
-      return balances[_account] - locked[_account];
-    } else {
-      return balances[_account];
-    }
-  }	  
 
   // Owner Functions ------------------
+  
+  /* set ETH/US$ cents exchange rate */
+
+  function setEthCents(uint _cents) private {
+    // set to private so it cannot be called
+    require( msg.sender == owner || msg.sender == adminWallet );
+    require( _cents > 0 );
+    ethCents = _cents;
+    EthCentsUpdated(_cents);
+  }
   
   /* Change the crowdsale wallet address */
 
@@ -312,6 +313,14 @@ contract GizerToken is ERC20Token {
     require( _wallet != address(0x0) );
     wallet = _wallet;
     WalletUpdated(_wallet);
+  }
+
+  /* Change the admin wallet address */
+
+  function setAdminWallet(address _wallet) public onlyOwner {
+    require( _wallet != address(0x0) );
+    adminWallet = _wallet;
+    AdminWalletUpdated(_wallet);
   }
 
   /* Change the redemption wallet address */
@@ -335,26 +344,9 @@ contract GizerToken is ERC20Token {
     
     // log event
     Transfer(0x0, _account, _tokens);
-    TokensIssuedOwner(_account, _tokens, false);
+    TokensIssuedOwner(_account, _tokens);
   }
 
-  /* Minting of tokens by owner */
-
-  function mintTokensLocked(address _account, uint _tokens) public onlyOwner {
-    // check token amount
-    require( _tokens <= availableToMint() );
-    
-    // update
-    balances[_account] = balances[_account].add(_tokens);
-    locked[_account]   = locked[_account].add(_tokens);
-    tokensIssuedOwner  = tokensIssuedOwner.add(_tokens);
-    tokensIssuedTotal  = tokensIssuedTotal.add(_tokens);
-    
-    // log event
-    Transfer(0x0, _account, _tokens);
-    TokensIssuedOwner(_account, _tokens, true);
-  }  
-  
   /* Transfer out any accidentally sent ERC20 tokens */
 
   function transferAnyERC20Token(address tokenAddress, uint amount) public onlyOwner returns (bool success) {
@@ -373,7 +365,7 @@ contract GizerToken is ERC20Token {
     
     // check token volume
     uint tokensAvailable = TOKEN_SUPPLY_CROWD.sub(tokensIssuedCrowd);
-    uint tokens = msg.value.mul(TOKENS_PER_ETH);
+    uint tokens = ethCents.mul(msg.value) / CENTS_PER_TOKEN / E6 / E6;
     require( tokens <= tokensAvailable );
     
     // issue tokens
@@ -402,7 +394,6 @@ contract GizerToken is ERC20Token {
 
   function transfer(address _to, uint _amount) public returns (bool success) {
     require( tradeable() );
-    require( unlockedTokens(msg.sender) >= _amount );
     return super.transfer(_to, _amount);
   }
   
@@ -410,7 +401,6 @@ contract GizerToken is ERC20Token {
 
   function transferFrom(address _from, address _to, uint _amount) public returns (bool success) {
     require( tradeable() );
-    require( unlockedTokens(_from) >= _amount ); 
     return super.transferFrom(_from, _to, _amount);
   }
 
@@ -421,18 +411,7 @@ contract GizerToken is ERC20Token {
   function transferMultiple(address[] _addresses, uint[] _amounts) external {
     require( tradeable() );
     require( _addresses.length == _amounts.length );
-    
-	uint i;
-	
-    // check token amounts
-    uint tokens_to_transfer = 0;
-    for (i = 0; i < _addresses.length; i++) {
-      tokens_to_transfer = tokens_to_transfer.add(_amounts[i]);
-    }
-    require( tokens_to_transfer <= unlockedTokens(msg.sender) );
-    
-    // do the transfers
-    for (i = 0; i < _addresses.length; i++) {
+    for (uint i = 0; i < _addresses.length; i++) {
       super.transfer(_addresses[i], _amounts[i]);
     }
   }  
