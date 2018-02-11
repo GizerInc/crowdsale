@@ -1,0 +1,312 @@
+2018-02-11 23:34:49 UTC
+
+========================================
+== Contract Gizer Gaming Token initialized
+== 
+At address 0x287110C1CC5a8E4Ca3Bc42D993688C7B15312eDE
+
+===============================================================================
+============ Preliminary actions
+===============================================================================
+
+========================================
+== Set wallets
+== 
+
+ACTIONS
+
+VERIFY
+ok  val [wallet acc]  is f895b6041f3953b529910ba5ec50ec9a3320dc5a as expected
+ok  val [redemption_wallet acc]  is 95f928d6dbf46b9aca73782485fe912e1a9a3bc6 as expected
+
+DIFFERENCES
+[:c, :wallet, "7df97252dba710b75a5364bf4bcddf12c9e4559d", "f895b6041f3953b529910ba5ec50ec9a3320dc5a"]
+[:c, :redemption_wallet, "7df97252dba710b75a5364bf4bcddf12c9e4559d", "95f928d6dbf46b9aca73782485fe912e1a9a3bc6"]
+
+===============================================================================
+============ Before crowdsale
+===============================================================================
+
+========================================
+== Some minting (ok) and an early contribution (throws)
+== 
+
+ACTIONS
+CONTRIBUTE : @client.transfer(acct_#<Eth::Key:0x0000000005f634c0>, 0x287110C1CC5a8E4Ca3Bc42D993688C7B15312eDE, 10)
+
+VERIFY
+ok  val [balance_of acc9] 9 is 1714112000000 as expected
+ok  diff [balance_of acc9] is 1714112000000 as expected
+ok  val [balance_of acc1] 1 is 1000000000000 as expected
+ok  diff [balance_of acc1] is 1000000000000 as expected
+ok  val [balance_of acc2] 2 is 0 as expected
+ok  diff [balance_of acc2] is 0 as expected
+ok  val [balance_of acc3] 3 is 0 as expected
+ok  diff [balance_of acc3] is 0 as expected
+ok  val [locked acc1] 1 is 500000000000 as expected
+ok  diff [locked acc1] is 500000000000 as expected
+ok  val [locked acc9] 9 is 0 as expected
+ok  diff [locked acc9] is 0 as expected
+ok  val [tokens_issued_total acc]  is 2714112000000 as expected
+ok  diff [tokens_issued_total acc] is 2714112000000 as expected
+ok  val [tradeable acc]  is false as expected
+
+DIFFERENCES
+[:c, :tokens_issued_owner, 0.0, 2714112.0, 2714112.0]
+[:c, :tokens_issued_total, 0.0, 2714112.0, 2714112.0]
+[:c, :tokens_issued_locked, 0.0, 500000.0, 500000.0]
+[:c, :available_to_mint, 3714112000000, 1000000000000, -2714112000000]
+[1, :get_balance, 992760.1327785039, 992760.0447785041, -0.088]
+[1, :balance_of, 0, 1000000000000, 1000000000000]
+[1, :locked, 0, 500000000000, 500000000000]
+[9, :balance_of, 0, 1714112000000, 1714112000000]
+
+========================================
+== Transfers are not possible
+== 
+
+ACTIONS
+
+VERIFY
+ok  diff [balance_of acc1] is 0 as expected
+
+DIFFERENCES
+[1, :get_balance, 992760.0447785041, 992759.956778504, -0.088]
+
+===============================================================================
+============ Crowdsale
+===============================================================================
+
+========================================
+== crowdsale
+== 
+
+ACTIONS
+
+VERIFY
+ok  val [at_now acc]  is 1518703201 as expected
+
+DIFFERENCES
+[:c, :at_now, 1, 1518703201, 1518703200]
+
+========================================
+== Some contributions and minting
+== 
+
+ACTIONS
+CONTRIBUTE : @client.transfer(acct_#<Eth::Key:0x0000000005f634c0>, 0x287110C1CC5a8E4Ca3Bc42D993688C7B15312eDE, 1000)
+CONTRIBUTE : @client.transfer(acct_#<Eth::Key:0x0000000005f62e58>, 0x287110C1CC5a8E4Ca3Bc42D993688C7B15312eDE, 100)
+CONTRIBUTE : @client.transfer(acct_#<Eth::Key:0x0000000005f62818>, 0x287110C1CC5a8E4Ca3Bc42D993688C7B15312eDE, 4000)
+CONTRIBUTE : @client.transfer(acct_#<Eth::Key:0x0000000005f621d8>, 0x287110C1CC5a8E4Ca3Bc42D993688C7B15312eDE, 2000)
+
+VERIFY
+ok  diff [balance_of acc1] is 1000000000000 as expected
+ok  diff [balance_of acc2] is 100000000000 as expected
+ok  diff [balance_of acc3] is 4000000000000 as expected
+ok  diff [balance_of acc4] is 1000000000000 as expected
+ok  val [tradeable acc]  is false as expected
+
+DIFFERENCES
+[:c, :ether_received, 0.0, 5100.0, 5100.0]
+[:c, :tokens_issued_crowd, 0.0, 5100000.0, 5100000.0]
+[:c, :tokens_issued_owner, 2714112.0, 3714112.0, 1000000.0]
+[:c, :tokens_issued_total, 2714112.0, 8814112.0, 6100000.0]
+[:c, :available_to_mint, 1000000000000, 0, -1000000000000]
+[1, :get_balance, 992759.956778504, 991759.9539863741, -1000.0027921300001]
+[1, :balance_of, 1000000000000, 2000000000000, 1000000000000]
+[1, :ether_contributed, 0.0, 1000.0, 1000.0]
+[1, :tokens_received, 0.0, 1000000.0, 1000000.0]
+[2, :get_balance, 984549.262535668, 984449.260073538, -100.00246213]
+[2, :balance_of, 0, 100000000000, 100000000000]
+[2, :ether_contributed, 0.0, 100.0, 100.0]
+[2, :tokens_received, 0.0, 100000.0, 100000.0]
+[3, :get_balance, 982444.64279404, 978444.64033191, -4000.00246213]
+[3, :balance_of, 0, 4000000000000, 4000000000000]
+[3, :ether_contributed, 0.0, 4000.0, 4000.0]
+[3, :tokens_received, 0.0, 4000000.0, 4000000.0]
+[4, :get_balance, 998348.91923108, 998348.83123108, -0.088]
+[4, :balance_of, 0, 1000000000000, 1000000000000]
+
+========================================
+== Another contribution
+== 
+
+ACTIONS
+CONTRIBUTE : @client.transfer(acct_#<Eth::Key:0x0000000005f62818>, 0x287110C1CC5a8E4Ca3Bc42D993688C7B15312eDE, 111)
+
+VERIFY
+ok  diff [balance_of acc3] is 111000000000 as expected
+
+DIFFERENCES
+[:c, :ether_received, 5100.0, 5211.0, 111.0]
+[:c, :tokens_issued_crowd, 5100000.0, 5211000.0, 111000.0]
+[:c, :tokens_issued_total, 8814112.0, 8925112.0, 111000.0]
+[3, :get_balance, 978444.64033191, 978333.63885978, -111.00147213]
+[3, :balance_of, 4000000000000, 4111000000000, 111000000000]
+[3, :ether_contributed, 4000.0, 4111.0, 111.0]
+[3, :tokens_received, 4000000.0, 4111000.0, 111000.0]
+
+========================================
+== Transfer - fails (not tradeable)
+== 
+
+ACTIONS
+
+VERIFY
+ok  diff [balance_of acc1] is 0 as expected
+ok  val [balance_of acc19] 19 is 0 as expected
+ok  diff [balance_of acc19] is 0 as expected
+ok  val [tradeable acc]  is false as expected
+
+DIFFERENCES
+[1, :get_balance, 991759.9539863741, 991759.865986374, -0.088]
+
+===============================================================================
+============ After Crowdsale
+===============================================================================
+
+========================================
+== after crowdsale
+== 
+
+ACTIONS
+
+VERIFY
+ok  val [at_now acc]  is 1521118801 as expected
+
+DIFFERENCES
+[:c, :at_now, 1518703201, 1521118801, 2415600]
+[:c, :available_to_mint, 0, 1074888000000, 1074888000000]
+[:c, :tradeable, false, true]
+
+========================================
+== Contributions (fail) and minting
+== 
+
+ACTIONS
+CONTRIBUTE : @client.transfer(acct_#<Eth::Key:0x0000000005f634c0>, 0x287110C1CC5a8E4Ca3Bc42D993688C7B15312eDE, 1)
+
+VERIFY
+ok  diff [balance_of acc1] is 0 as expected
+ok  val [balance_of acc7] 7 is 74888000000 as expected
+ok  diff [balance_of acc7] is 74888000000 as expected
+ok  val [balance_of acc8] 8 is 1000000000000 as expected
+ok  diff [balance_of acc8] is 1000000000000 as expected
+ok  val [locked acc8] 8 is 200000000000 as expected
+ok  diff [locked acc8] is 200000000000 as expected
+ok  val [tradeable acc]  is true as expected
+ok  val [available_to_mint acc]  is 0 as expected
+ok  diff [unlocked_tokens acc8] is 800000000000 as expected
+
+DIFFERENCES
+[:c, :tokens_issued_owner, 3714112.0, 4789000.0, 1074888.0]
+[:c, :tokens_issued_total, 8925112.0, 10000000.0, 1074888.0]
+[:c, :tokens_issued_locked, 500000.0, 700000.0, 200000.0]
+[:c, :available_to_mint, 1074888000000, 0, -1074888000000]
+[1, :get_balance, 991759.865986374, 991759.7779863741, -0.088]
+[7, :balance_of, 0, 74888000000, 74888000000]
+[8, :balance_of, 0, 1000000000000, 1000000000000]
+[8, :locked, 0, 200000000000, 200000000000]
+
+========================================
+== Transfer multiple - not ok, exceeds unlocked
+== 
+
+ACTIONS
+
+VERIFY
+ok  diff [balance_of acc1] is 0 as expected
+ok  val [balance_of acc11] 11 is 0 as expected
+ok  diff [balance_of acc11] is 0 as expected
+ok  val [balance_of acc12] 12 is 0 as expected
+ok  diff [balance_of acc12] is 0 as expected
+ok  val [balance_of acc13] 13 is 0 as expected
+ok  diff [balance_of acc13] is 0 as expected
+
+DIFFERENCES
+[1, :get_balance, 991759.7779863741, 991759.689986374, -0.088]
+
+========================================
+== Transfer multiple - now ok, exactly unlocked
+== 
+
+ACTIONS
+
+VERIFY
+ok  val [balance_of acc1] 1 is 500000000000 as expected
+ok  diff [balance_of acc1] is -1500000000000 as expected
+ok  val [balance_of acc11] 11 is 400000000000 as expected
+ok  diff [balance_of acc11] is 400000000000 as expected
+ok  val [balance_of acc12] 12 is 500000000000 as expected
+ok  diff [balance_of acc12] is 500000000000 as expected
+ok  val [balance_of acc13] 13 is 600000000000 as expected
+ok  diff [balance_of acc13] is 600000000000 as expected
+ok  val [balance_of acc19] 19 is 0 as expected
+ok  diff [balance_of acc19] is 0 as expected
+
+DIFFERENCES
+[1, :get_balance, 991759.689986374, 991759.599436332, -0.090550042]
+[1, :balance_of, 2000000000000, 500000000000, -1500000000000]
+[11, :balance_of, 0, 400000000000, 400000000000]
+[12, :balance_of, 0, 500000000000, 500000000000]
+[13, :balance_of, 0, 600000000000, 600000000000]
+
+========================================
+== Transfer from
+== 
+
+ACTIONS
+
+VERIFY
+ok  val [balance_of acc8] 8 is 200000000000 as expected
+ok  diff [balance_of acc8] is -800000000000 as expected
+ok  val [balance_of acc14] 14 is 500000000000 as expected
+ok  diff [balance_of acc14] is 500000000000 as expected
+ok  val [balance_of acc15] 15 is 300000000000 as expected
+ok  diff [balance_of acc15] is 300000000000 as expected
+ok  val [balance_of acc16] 16 is 0 as expected
+ok  diff [balance_of acc16] is 0 as expected
+
+DIFFERENCES
+[8, :get_balance, 999999.992949418, 999999.991942192, -0.001007226]
+[8, :balance_of, 1000000000000, 200000000000, -800000000000]
+[10, :get_balance, 999999.359669914, 999999.269003074, -0.09066684]
+[14, :balance_of, 0, 500000000000, 500000000000]
+[15, :balance_of, 0, 300000000000, 300000000000]
+
+===============================================================================
+============ After Tokens unlocked
+===============================================================================
+
+========================================
+== after tokens unlocked
+== 
+
+ACTIONS
+
+VERIFY
+ok  val [at_now acc]  is 1537016401 as expected
+
+DIFFERENCES
+[:c, :at_now, 1521118801, 1537016401, 15897600]
+
+========================================
+== Transfer from
+== 
+
+ACTIONS
+
+VERIFY
+ok  val [balance_of acc8] 8 is 0 as expected
+ok  diff [balance_of acc8] is -200000000000 as expected
+ok  val [balance_of acc16] 16 is 200000000000 as expected
+ok  diff [balance_of acc16] is 200000000000 as expected
+
+DIFFERENCES
+[8, :balance_of, 200000000000, 0, -200000000000]
+[10, :get_balance, 999999.269003074, 999999.268335616, -0.000667458]
+[16, :balance_of, 0, 200000000000, 200000000000]
+
+Errors found: 0
+
+2018-02-11 23:35:31 UTC
