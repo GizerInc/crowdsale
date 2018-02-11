@@ -199,7 +199,7 @@ contract ERC20Token is ERC20Interface, Owned {
 
 contract GizerToken is ERC20Token {
 
-  /* Utility variables */
+  /* Utility variable */
   
   uint constant E6  = 10**6;
 
@@ -216,28 +216,29 @@ contract GizerToken is ERC20Token {
 
   /* Crowdsale parameters (constants) */
 
-  uint public DATE_ICO_START = 1517580000; // 02-Feb-2018 14:00 UTC 09:00 EST ???
-  uint public DATE_ICO_END   = 1519826400; // 28-Feb-2010 14:00 UTC 09:00 EST ???
+  uint public constant DATE_ICO_START = 1518703200; // 15-Feb-2018 14:00 UTC 09:00 EST
+  uint public constant DATE_ICO_END   = 1521118800; // 15-Mar-2018 13:00 UTC 09:00 EST
 
   uint public constant TOKEN_SUPPLY_TOTAL = 10000000 * E6;
   uint public constant TOKEN_SUPPLY_CROWD =  6285888 * E6;
-  uint public constant TOKEN_SUPPLY_OWNER =  3714112 * E6; //  2,000,000 tokens reserve
-                                                           //  1,714,112 presale tokens
+  uint public constant TOKEN_SUPPLY_OWNER =  3714112 * E6; // 2,000,000 tokens reserve
+                                                           // 1,714,112 presale tokens
 
   uint public constant MIN_CONTRIBUTION = 1 ether / 100;  
   
   uint public constant TOKENS_PER_ETH = 1000;
   
-  uint public constant DATE_TOKENS_UNLOCKED = 1519826400; // ???
+  uint public constant DATE_TOKENS_UNLOCKED = 1537016400; // 15-SEP-2018 13:00 UTC 09:00 EST
   
   /* Crowdsale variables */
 
-  uint public tokensIssuedCrowd = 0;
-  uint public tokensIssuedOwner = 0;
+  uint public tokensIssuedCrowd  = 0;
+  uint public tokensIssuedOwner  = 0;
+  uint public tokensIssuedLocked = 0;
   
-  uint public etherReceived = 0;
+  uint public etherReceived = 0; // does not include presale ethers
 
-  /* Keep track of + Ether contributed,
+  /* Keep track of + ethers contributed,
                    + tokens received 
                    + tokens locked during Crowdsale */
   
@@ -349,6 +350,7 @@ contract GizerToken is ERC20Token {
     locked[_account]   = locked[_account].add(_tokens);
     tokensIssuedOwner  = tokensIssuedOwner.add(_tokens);
     tokensIssuedTotal  = tokensIssuedTotal.add(_tokens);
+	tokensIssuedLocked = tokensIssuedLocked.add(_tokens);
     
     // log event
     Transfer(0x0, _account, _tokens);
@@ -373,7 +375,7 @@ contract GizerToken is ERC20Token {
     
     // check token volume
     uint tokensAvailable = TOKEN_SUPPLY_CROWD.sub(tokensIssuedCrowd);
-    uint tokens = msg.value.mul(TOKENS_PER_ETH);
+    uint tokens = msg.value.mul(TOKENS_PER_ETH) / 10**12;
     require( tokens <= tokensAvailable );
     
     // issue tokens
@@ -421,7 +423,8 @@ contract GizerToken is ERC20Token {
   function transferMultiple(address[] _addresses, uint[] _amounts) external {
     require( tradeable() );
     require( _addresses.length == _amounts.length );
-    
+    require( _addresses.length <= 100 );
+	
 	uint i;
 	
     // check token amounts
