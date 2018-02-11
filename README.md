@@ -7,6 +7,11 @@ Users can collect items for rank, statistics, and customize their avatars to gai
 For more information, visit https://tokensale.gizer.io/
 
 
-## Audit
+## Tests of crwodalse contract
+
+https://github.com/GizerInc/crowdsale/tree/master/dev-tests-2018-02
+
+
+## Audit of presale contract
 
 https://github.com/bokkypoobah/GizerCrowdsaleAudit/tree/master/audit
