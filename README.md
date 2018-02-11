@@ -7,9 +7,13 @@ Users can collect items for rank, statistics, and customize their avatars to gai
 For more information, visit https://tokensale.gizer.io/
 
 
-## Tests of crwodalse contract
+## Tests of crowdsale contract
+
+Testing of the crowdsale contract was completed on 12-Feb-2018, the results can be seen at:
 
 https://github.com/GizerInc/crowdsale/tree/master/dev-tests-2018-02
+
+The main test script is _GZR_test_1.rb_, the resulting log is _sLog_1.log_
 
 
 ## Audit of presale contract
