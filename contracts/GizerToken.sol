@@ -303,7 +303,7 @@ contract GizerToken is ERC20Token {
     } else {
       return balances[_account];
     }
-  }	  
+  }
 
   // Owner Functions ------------------
   
@@ -350,7 +350,7 @@ contract GizerToken is ERC20Token {
     locked[_account]   = locked[_account].add(_tokens);
     tokensIssuedOwner  = tokensIssuedOwner.add(_tokens);
     tokensIssuedTotal  = tokensIssuedTotal.add(_tokens);
-	tokensIssuedLocked = tokensIssuedLocked.add(_tokens);
+    tokensIssuedLocked = tokensIssuedLocked.add(_tokens);
     
     // log event
     Transfer(0x0, _account, _tokens);
@@ -424,9 +424,9 @@ contract GizerToken is ERC20Token {
     require( tradeable() );
     require( _addresses.length == _amounts.length );
     require( _addresses.length <= 100 );
-	
-	uint i;
-	
+    
+    uint i;
+    
     // check token amounts
     uint tokens_to_transfer = 0;
     for (i = 0; i < _addresses.length; i++) {
