@@ -216,19 +216,19 @@ contract GizerToken is ERC20Token {
 
   /* Crowdsale parameters (constants) */
 
-  uint public constant DATE_ICO_START = 1518703200; // 15-Feb-2018 14:00 UTC 09:00 EST
-  uint public constant DATE_ICO_END   = 1521118800; // 15-Mar-2018 13:00 UTC 09:00 EST
+  uint public constant DATE_ICO_START = 1518962400; // 18-Feb-2018 14:00 UTC 09:00 EST
+  uint public constant DATE_ICO_END   = 1521122400; // 15-Mar-2018 14:00 UTC 10:00 EST
 
   uint public constant TOKEN_SUPPLY_TOTAL = 10000000 * E6;
-  uint public constant TOKEN_SUPPLY_CROWD =  6285888 * E6;
-  uint public constant TOKEN_SUPPLY_OWNER =  3714112 * E6; // 2,000,000 tokens reserve
-                                                           // 1,714,112 presale tokens
+  uint public constant TOKEN_SUPPLY_CROWD =  6112926 * E6;
+  uint public constant TOKEN_SUPPLY_OWNER =  3887074 * E6; // 2,000,000 tokens reserve
+                                                           // 1,887,074 presale tokens
 
   uint public constant MIN_CONTRIBUTION = 1 ether / 100;  
   
   uint public constant TOKENS_PER_ETH = 1000;
   
-  uint public constant DATE_TOKENS_UNLOCKED = 1537016400; // 15-SEP-2018 13:00 UTC 09:00 EST
+  uint public constant DATE_TOKENS_UNLOCKED = 1537020000; // 15-SEP-2018 14:00 UTC 10:00 EST
   
   /* Crowdsale variables */
 
