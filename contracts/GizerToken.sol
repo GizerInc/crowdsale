@@ -485,7 +485,7 @@ contract GizerToken is ERC20Token {
   function mintItem(address _owner) internal returns(uint idx, bytes32 uuid) {
     GizerItemsInterface g = GizerItemsInterface(gizerItemsContract);
     return g.mint(_owner);
-  }  
+  }
   
 }
 

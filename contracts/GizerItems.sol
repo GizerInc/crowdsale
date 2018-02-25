@@ -120,10 +120,10 @@ interface ERC721Interface /* is ERC165 */ {
 
     function balanceOf(address _owner) external view returns (uint256 _balance);
     function ownerOf(uint256 _deedId) external view returns (address _owner);
-    function transfer(address _to, uint256 _deedId) external; // removed payable
+    function transfer(address _to, uint256 _deedId) external;                    // removed payable
     function transferFrom(address _from, address _to, uint256 _deedId) external; // removed payable
-    function approve(address _approved, uint256 _deedId) external; // removed payable
-    // function setApprovalForAll(address _operateor, boolean _approved; // removed payable
+    function approve(address _approved, uint256 _deedId) external;               // removed payable
+    // function setApprovalForAll(address _operateor, boolean _approved);        // removed payable
     // function supportsInterface(bytes4 interfaceID) external view returns (bool);
 }
 
@@ -151,20 +151,19 @@ contract ERC721Token is ERC721Interface, ERC721Metadata, ERC721Enumerable, Owned
   
   using SafeMath for uint;
 
-  uint public tokensIssuedTotal = 0;
   uint public ownerCount = 0;
   uint public deedCount = 0;
   
-  mapping(address => uint) balances;
-  mapping(uint => address) mIdOwner;
-  mapping(uint => address) mIdApproved;
+  mapping(address => uint) public balances;
+  mapping(uint => address) public mIdOwner;
+  mapping(uint => address) public mIdApproved;
 
   // Required Functions ------------------------
 
   /* Get the number of tokens held by an address */
 
   function balanceOf(address _owner) external view returns (uint balance) {
-    return balances[_owner];
+    balance = balances[_owner];
   }
 
   /* Get the owner of a certain token */
@@ -174,20 +173,12 @@ contract ERC721Token is ERC721Interface, ERC721Metadata, ERC721Enumerable, Owned
     require( owner != address(0x0) );
   }
 
-  /* Approve token transfer (we do not make it payable) */
-  
-   function approve(address _approved, uint _id) external {
-       require( msg.sender == mIdOwner[_id] );
-       require( msg.sender != _approved );
-       mIdApproved[_id] = _approved;
-       Approval(msg.sender, _approved, _id);
-   }
-   
   /* Transfer token */
   
   function transfer(address _to, uint _id) external {
-    // check ownership
+    // check ownership and address
     require( msg.sender == mIdOwner[_id] );
+	require( _to != address(0x0) );
 
     // transfer ownership
     mIdOwner[_id] = _to;
@@ -217,15 +208,22 @@ contract ERC721Token is ERC721Interface, ERC721Metadata, ERC721Enumerable, Owned
     Transfer(_from, _to, _id);
   }
 
+  /* Approve token transfer (we do not make it payable) */
+  
+   function approve(address _approved, uint _id) external {
+       require( msg.sender == mIdOwner[_id] );
+       require( msg.sender != _approved );
+       mIdApproved[_id] = _approved;
+       Approval(msg.sender, _approved, _id);
+   }
+
   // Metadata Functions ---------------
 
 
   // Enumeration Functions ------------
   
-  /* Total token supply */
-
-  function totalSupply() external view returns (uint) {
-    return tokensIssuedTotal;
+  function totalSupply() external view returns (uint count) {
+    count = deedCount;
   }
 
   function deedByIndex(uint _index) external view returns (uint id) {
@@ -236,15 +234,6 @@ contract ERC721Token is ERC721Interface, ERC721Metadata, ERC721Enumerable, Owned
   function countOfOwners() external view returns (uint count) {
     count = ownerCount;
   }
-
-  function countOfDeeds() external view returns (uint count) {
-    count = deedCount;
-  }
-
-  function ownerByIndex(uint _index) external view returns (address owner) {
-    require( _index < ownerCount );
-    owner = mIdOwner[_index];
-  }  
   
   // Internal functions ---------------
   
@@ -273,21 +262,23 @@ contract GizerItems is ERC721Token {
   /* Basic token data */
   
   string public constant name   = "Gizer Item";
-  string public constant symbol = "GZR";
+  string public constant symbol = "GZR721";
   
   /* uuid information */
 
-  bytes32[] code;
-  uint[] weight;
-  mapping(bytes32 => uint) mCodeIndexPlus; // index + 1
-  uint sumOfWeights;
+  bytes32[] public code;
+  uint[] public weight;
+  uint public sumOfWeights;
   
-  /* nonce for pseudo-randomisation */
+  mapping(bytes32 => uint) public mCodeIndexPlus; // index + 1
+
+  /* Pseudo-randomisation variables */
 
   uint public nonce = 0;
   uint public lastRandom = 0;
   
   /* mapping from item index to uuid */
+  
   mapping(uint => bytes32) mIdxIUuid;
   
   // Events ---------------------------
@@ -302,12 +293,22 @@ contract GizerItems is ERC721Token {
   
   function () public payable { revert(); }
   
+  // Information functions ------------
+
+  function deedUri(uint _id) external view returns (string) {
+    return bytes32ToString(mIdxIUuid[_id]);
+  }
   
+  function getUuid(uint _id) external view returns (string) {
+    require( _id < code.length );
+	return bytes32ToString(code[_id]);  
+  }
+
   // Token Minting --------------------
   
   function mint(address _to) public onlyAdmin returns (uint idx, bytes32 uuid32) {
     
-    // 
+    // initial checks
     require( sumOfWeights > 0 );
     require( _to != address(0x0) );
     require( _to != address(this) );
@@ -316,10 +317,9 @@ contract GizerItems is ERC721Token {
     uuid32 = getRandomUuid();
 
     // mint token
-    tokensIssuedTotal++;
-    idx = tokensIssuedTotal;
-    mIdxIUuid[idx] = uuid32;
     deedCount++;
+    idx = deedCount;
+    mIdxIUuid[idx] = uuid32;
 
     // update balance and owner count
     updateBalances(address(0x0), _to);
@@ -368,7 +368,8 @@ contract GizerItems is ERC721Token {
     bytes32 uuid32 = stringToBytes32(_code);
 
     // weight posiitve & code not yet registered
-    require( _weight > 0 );
+    require( bytes(_code).length > 0 );
+	require( _weight > 0 );
     require( mCodeIndexPlus[uuid32] == 0 );
 
     // add to end of array
@@ -441,7 +442,8 @@ contract GizerItems is ERC721Token {
       return ERC20Interface(tokenAddress).transfer(owner, amount);
   }
   
-  /* Utility function */
+  // Utility functions ----------------
+
   /* https://ethereum.stackexchange.com/questions/9142/how-to-convert-a-string-to-bytes32 */
   
   function stringToBytes32(string memory source) public pure returns (bytes32 result) {
@@ -454,7 +456,26 @@ contract GizerItems is ERC721Token {
         result := mload(add(source, 32))
     }
   }
+  
+  /* https://ethereum.stackexchange.com/questions/2519/how-to-convert-a-bytes32-to-string */
 
+  function bytes32ToString(bytes32 x) public pure returns (string) {
+    bytes memory bytesString = new bytes(32);
+    uint charCount = 0;
+    for (uint j = 0; j < 32; j++) {
+      byte char = byte(bytes32(uint(x) * 2 ** (8 * j)));
+      if (char != 0) {
+        bytesString[charCount] = char;
+        charCount++;
+      }
+    }
+    bytes memory bytesStringTrimmed = new bytes(charCount);
+    for (j = 0; j < charCount; j++) {
+      bytesStringTrimmed[j] = bytesString[j];
+    }
+    return string(bytesStringTrimmed);
+  }
+  
 }
 
 // ----------------------------------------------------------------------------
