@@ -467,24 +467,45 @@ contract GizerToken is ERC20Token {
   
   /* GZR token owner buys Item directly */ 
   
-  function mintDirectly() public returns (uint idx, bytes32 uuid) {
+  function mintDirectly() public returns (uint idx, string uuid) {
     super.transfer(redemptionWallet, E6);
-    return mintItem(msg.sender);
+	return mintItem(msg.sender);
   }
   
   /* Admin mints item on GZR owner's behalf */
   /* (requires previous approve) */  
   
-  function mintByAdmin(address _owner) public onlyAdmin returns (uint idx, bytes32 uuid) {
+  function mintByAdmin(address _owner) public onlyAdmin returns (uint idx, string uuid) {
     super.transferFrom(_owner, redemptionWallet, E6);
     return mintItem(_owner);
   }
   
   /* Internal function to call */
   
-  function mintItem(address _owner) internal returns(uint idx, bytes32 uuid) {
+  function mintItem(address _owner) internal returns(uint idx, string uuid) {
     GizerItemsInterface g = GizerItemsInterface(gizerItemsContract);
-    return g.mint(_owner);
+	bytes32 uuid32;
+    (idx, uuid32) = g.mint(_owner);
+	uuid = bytes32ToString(uuid32);
+  }
+  
+  /* https://ethereum.stackexchange.com/questions/2519/how-to-convert-a-bytes32-to-string */
+
+  function bytes32ToString(bytes32 x) public pure returns (string) {
+    bytes memory bytesString = new bytes(32);
+    uint charCount = 0;
+    for (uint j = 0; j < 32; j++) {
+      byte char = byte(bytes32(uint(x) * 2 ** (8 * j)));
+      if (char != 0) {
+        bytesString[charCount] = char;
+        charCount++;
+      }
+    }
+    bytes memory bytesStringTrimmed = new bytes(charCount);
+    for (j = 0; j < charCount; j++) {
+      bytesStringTrimmed[j] = bytesString[j];
+    }
+    return string(bytesStringTrimmed);
   }
   
 }

@@ -4,9 +4,6 @@ pragma solidity ^0.4.20;
 //
 // Gizer Items - ERC721(ish) contract
 //
-// version 0.1 23-Feb-2018
-// version 0.2 25-Feb-2018
-// 
 // ----------------------------------------------------------------------------
 
 
@@ -261,8 +258,8 @@ contract GizerItems is ERC721Token {
 
   /* Basic token data */
   
-  string public constant name   = "Gizer Item";
-  string public constant symbol = "GZR721";
+  string constant cName   = "Gizer Item";
+  string constant cSymbol = "GZR721";
   
   /* uuid information */
 
@@ -285,16 +282,43 @@ contract GizerItems is ERC721Token {
   
   event MintToken(address indexed minter, address indexed _owner, bytes32 indexed _code, uint _input);
   
-  event CodeUpdate(bytes32 indexed _type, bytes32 indexed _code, uint _weight, uint _sumOfWeights);
+  event CodeUpdate(uint8 indexed _type, bytes32 indexed _code, uint _weight, uint _sumOfWeights);
   
   // Basic Functions ------------------
   
-  function GizerItems() public {}
+  function GizerItems() public {
+	// load initial codes
+	addCode("74143b3842ff373eb111d12f1f497611,  500);
+    addCode("564b40b09a8239fbbe400e9120b85386, 1120);
+    addCode("457c0757d4bc3452853f9b3f48b70899,  500);
+    addCode("785ddae3685c3c58bba1566c245e5c72, 1120);
+    addCode("28a41f370fcc3b57b854ddd6529b8028, 1120);
+    addCode("c1e8314b14dc3ec984b9409da3219371, 1300);
+    addCode("eaba91e8e2ce35609c0f5ac992987af8, 1300);
+    addCode("48ddee5a71e63d31aafb99adcaa54ed1, 1120);
+    addCode("43db1b25e3a13e958eb7346e6f7b69b5, 1300);
+    addCode("47e457e721d43d85ab974a0ec3a135a9, 1300);
+    addCode("eea5776e85a73e398ae4f030949ac4b4, 1300);
+    addCode("0a10e405769d3fd983a70cc3f6a8ac17, 1300);
+    addCode("6ed505f443dd3f1fb834ce482fcf15d2,  500);
+    addCode("8f7690bbb3053f4ba8548d97cf89c852,  400);
+    addCode("69a1dc553de83504aabdb6858f4923d3, 1300);
+    addCode("b51f0d6813a73ccb9c9bd741118d622b, 1300);
+    addCode("70a34eb62d3234689bd56643cdfb514f,  400);
+  }
   
   function () public payable { revert(); }
   
   // Information functions ------------
 
+  function name() external pure returns (string) {
+    return cName;
+  }
+  
+  function symbol() external pure returns (string) {
+    return cSymbol;
+  }	
+  
   function deedUri(uint _id) external view returns (string) {
     return bytes32ToString(mIdxIUuid[_id]);
   }
@@ -368,14 +392,13 @@ contract GizerItems is ERC721Token {
     bytes32 uuid32 = stringToBytes32(_code);
 
     // weight posiitve & code not yet registered
-    require( bytes(_code).length > 0 );
 	require( _weight > 0 );
     require( mCodeIndexPlus[uuid32] == 0 );
 
     // add to end of array
     uint idx = code.length;
-    code[idx] = uuid32;
-    weight[idx] = _weight;
+    code.push(uuid32);
+    weight.push(_weight);
     mCodeIndexPlus[uuid32] = idx + 1;
 
     // update sum of weights
@@ -429,7 +452,9 @@ contract GizerItems is ERC721Token {
     }
     // delete last element of arrays
     delete code[idxLast];
+	code.length--;
     delete weight[idxLast];
+	weight.length--;
 
     // register event and return
     CodeUpdate(3, uuid32, 0, sumOfWeights);
@@ -486,20 +511,5 @@ contract GizerItems is ERC721Token {
 // ----------------------------------------------------------------------------
 
 contract ERC20Interface {
-
-  // Events ---------------------------
-
-  event Transfer(address indexed _from, address indexed _to, uint _value);
-  event Approval(address indexed _owner, address indexed _spender, uint _value);
-
-  // Functions ------------------------
-
-  function totalSupply() public view returns (uint);
-  function balanceOf(address _owner) public view returns (uint balance);
   function transfer(address _to, uint _value) public returns (bool success);
-  function transferFrom(address _from, address _to, uint _value) public returns (bool success);
-  function approve(address _spender, uint _value) public returns (bool success);
-  function allowance(address _owner, address _spender) public view returns (uint remaining);
-
 }
-
