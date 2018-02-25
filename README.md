@@ -11,7 +11,7 @@ For more information, visit https://tokensale.gizer.io/
 
 The address of contract GZR (GizerToken.sol) must be added to the list of admins of the GZR721 (GizerItems.sol) contract.
 
-The address used to clal mintByAdmin() in GZR must be added to the list of admins of the GZR contract, and the user must have called a allow() for that address.
+The address used to call mintByAdmin() in GZR must be added to the list of admins of the GZR contract, and the user must have called allow() for that address.
 
 To do:
 
