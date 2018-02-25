@@ -52,24 +52,21 @@ contract Owned {
 
   event OwnershipTransferProposed(address indexed _from, address indexed _to);
   event OwnershipTransferred(address indexed _from, address indexed _to);
-  
   event AdminChange(address indexed _admin, bool _status);
 
   // Modifiers ------------------------
 
   modifier onlyOwner { require( msg.sender == owner ); _; }
-  
   modifier onlyAdmin { require( isAdmin[msg.sender] ); _; }
 
   // Functions ------------------------
 
   function Owned() public {
     owner = msg.sender;
-	isAdmin[owner] = true;
+    isAdmin[owner] = true;
   }
 
   function transferOwnership(address _newOwner) public onlyOwner {
-    require( _newOwner != owner );
     require( _newOwner != address(0x0) );
     OwnershipTransferProposed(owner, _newOwner);
     newOwner = _newOwner;
@@ -83,14 +80,14 @@ contract Owned {
   
   function addAdmin(address _a) public onlyOwner {
     require( isAdmin[_a] == false );
-	isAdmin[_a] = true;
-	AdminChange(_a, true);
+    isAdmin[_a] = true;
+    AdminChange(_a, true);
   }
 
   function removeAdmin(address _a) public onlyOwner {
     require( isAdmin[_a] == true );
-	isAdmin[_a] = false;
-	AdminChange(_a, false);
+    isAdmin[_a] = false;
+    AdminChange(_a, false);
   }
   
 }
@@ -472,7 +469,7 @@ contract GizerToken is ERC20Token {
   
   function mintDirectly() public returns (uint idx, bytes32 uuid) {
     super.transfer(redemptionWallet, E6);
-	return mintItem(msg.sender);
+    return mintItem(msg.sender);
   }
   
   /* Admin mints item on GZR owner's behalf */
@@ -487,7 +484,7 @@ contract GizerToken is ERC20Token {
   
   function mintItem(address _owner) internal returns(uint idx, bytes32 uuid) {
     GizerItemsInterface g = GizerItemsInterface(gizerItemsContract);
-	return g.mint(_owner);
+    return g.mint(_owner);
   }  
   
 }

@@ -53,24 +53,21 @@ contract Owned {
 
   event OwnershipTransferProposed(address indexed _from, address indexed _to);
   event OwnershipTransferred(address indexed _from, address indexed _to);
-  
   event AdminChange(address indexed _admin, bool _status);
 
   // Modifiers ------------------------
 
   modifier onlyOwner { require( msg.sender == owner ); _; }
-  
   modifier onlyAdmin { require( isAdmin[msg.sender] ); _; }
 
   // Functions ------------------------
 
   function Owned() public {
     owner = msg.sender;
-	isAdmin[owner] = true;
+    isAdmin[owner] = true;
   }
 
   function transferOwnership(address _newOwner) public onlyOwner {
-    require( _newOwner != owner );
     require( _newOwner != address(0x0) );
     OwnershipTransferProposed(owner, _newOwner);
     newOwner = _newOwner;
@@ -84,14 +81,14 @@ contract Owned {
   
   function addAdmin(address _a) public onlyOwner {
     require( isAdmin[_a] == false );
-	isAdmin[_a] = true;
-	AdminChange(_a, true);
+    isAdmin[_a] = true;
+    AdminChange(_a, true);
   }
 
   function removeAdmin(address _a) public onlyOwner {
     require( isAdmin[_a] == true );
-	isAdmin[_a] = false;
-	AdminChange(_a, false);
+    isAdmin[_a] = false;
+    AdminChange(_a, false);
   }
   
 }
@@ -174,7 +171,7 @@ contract ERC721Token is ERC721Interface, ERC721Metadata, ERC721Enumerable, Owned
 
   function ownerOf(uint _id) external view returns (address owner) {
     owner = mIdOwner[_id];
-	require( owner != address(0x0) );
+    require( owner != address(0x0) );
   }
 
   /* Approve token transfer (we do not make it payable) */
@@ -190,34 +187,34 @@ contract ERC721Token is ERC721Interface, ERC721Metadata, ERC721Enumerable, Owned
   
   function transfer(address _to, uint _id) external {
     // check ownership
-	require( msg.sender == mIdOwner[_id] );
-	
-	// transfer ownership
-	mIdOwner[_id] = _to;
-	mIdApproved[_id] = address(0x0);
-	
-	// update balances
-	updateBalances(msg.sender, _to);
-	
-	// register event
-	Transfer(msg.sender, _to, _id);
+    require( msg.sender == mIdOwner[_id] );
+
+    // transfer ownership
+    mIdOwner[_id] = _to;
+    mIdApproved[_id] = address(0x0);
+
+    // update balances
+    updateBalances(msg.sender, _to);
+
+    // register event
+    Transfer(msg.sender, _to, _id);
   }
 
   /* Transfer from */
   
   function transferFrom(address _from, address _to, uint _id) external {
     // check if the sender has the right to transfer
-	require( _from == mIdOwner[_id] && mIdApproved[_id] == msg.sender );
-	
-	// transfer ownership and reset approval (if any)
-	mIdOwner[_id] = _to;
-	mIdApproved[_id] = address(0x0);
-	
-	// update balances
-	updateBalances(_from, _to);
-	
-	// register event
-	Transfer(_from, _to, _id);
+    require( _from == mIdOwner[_id] && mIdApproved[_id] == msg.sender );
+
+    // transfer ownership and reset approval (if any)
+    mIdOwner[_id] = _to;
+    mIdApproved[_id] = address(0x0);
+
+    // update balances
+    updateBalances(_from, _to);
+
+    // register event
+    Transfer(_from, _to, _id);
   }
 
   // Metadata Functions ---------------
@@ -233,7 +230,7 @@ contract ERC721Token is ERC721Interface, ERC721Metadata, ERC721Enumerable, Owned
 
   function deedByIndex(uint _index) external view returns (uint id) {
     id = _index;
-	require( id < deedCount );
+    require( id < deedCount );
   }  
   
   function countOfOwners() external view returns (uint count) {
@@ -246,7 +243,7 @@ contract ERC721Token is ERC721Interface, ERC721Metadata, ERC721Enumerable, Owned
 
   function ownerByIndex(uint _index) external view returns (address owner) {
     require( _index < ownerCount );
-	owner = mIdOwner[_index];
+    owner = mIdOwner[_index];
   }  
   
   // Internal functions ---------------
@@ -254,12 +251,12 @@ contract ERC721Token is ERC721Interface, ERC721Metadata, ERC721Enumerable, Owned
   function updateBalances(address _from, address _to) internal {
     // process from (skip if minted)
     if (_from != address(0x0)) {
-	  balances[_from]--;
-	  if (balances[_from] == 0) { ownerCount--; }
-	}
+      balances[_from]--;
+      if (balances[_from] == 0) { ownerCount--; }
+    }
     // process to
-	balances[_to]++;
-	if (balances[_to] == 1) { ownerCount++; }
+    balances[_to]++;
+    if (balances[_to] == 1) { ownerCount++; }
   }
       
 }
@@ -310,27 +307,27 @@ contract GizerItems is ERC721Token {
   
   function mint(address _to) public onlyAdmin returns (uint idx, bytes32 uuid32) {
     
-	// 
-	require( sumOfWeights > 0 );
-	require( _to != address(0x0) );
-	require( _to != address(this) );
-	
-	// get random uuid
-	uuid32 = getRandomUuid();
-	
-	// mint token
-	tokensIssuedTotal++;
-	idx = tokensIssuedTotal;
-	mIdxIUuid[idx] = uuid32;
-	deedCount++;
-	
-	// update balance and owner count
-	updateBalances(address(0x0), _to);
+    // 
+    require( sumOfWeights > 0 );
+    require( _to != address(0x0) );
+    require( _to != address(this) );
+
+    // get random uuid
+    uuid32 = getRandomUuid();
+
+    // mint token
+    tokensIssuedTotal++;
+    idx = tokensIssuedTotal;
+    mIdxIUuid[idx] = uuid32;
+    deedCount++;
+
+    // update balance and owner count
+    updateBalances(address(0x0), _to);
     mIdOwner[idx] = _to;
 
     // log event and return
-	MintToken(msg.sender, _to, uuid32, idx);
-	return(idx, uuid32);
+    MintToken(msg.sender, _to, uuid32, idx);
+    return(idx, uuid32);
   }
   
   
@@ -338,26 +335,26 @@ contract GizerItems is ERC721Token {
   
   function getRandomUuid() internal returns (bytes32) {
     // case where there is only one item type
-	if (code.length == 1) return code[0];
-	
-	// more than one
+    if (code.length == 1) return code[0];
+
+    // more than one
     updateRandom();
-	uint res = lastRandom % sumOfWeights;
-	uint cWeight = 0;
-	for (uint i = 0; i < code.length; i++) {
+    uint res = lastRandom % sumOfWeights;
+    uint cWeight = 0;
+    for (uint i = 0; i < code.length; i++) {
       cWeight = cWeight + weight[i];
-	  if (cWeight >= res) return code[i];
-	}
-	
-	// we should never get here
-	revert();
+      if (cWeight >= res) return code[i];
+    }
+
+    // we should never get here
+    revert();
   }
 
   function updateRandom() internal {
     nonce++;
-	lastRandom = uint(keccak256(
+    lastRandom = uint(keccak256(
         nonce,
-		lastRandom,
+        lastRandom,
         block.blockhash(block.number - 1),
         block.coinbase,
         block.difficulty
@@ -367,76 +364,76 @@ contract GizerItems is ERC721Token {
   // uuint functions ------------------
   
   function addCode(string _code, uint _weight) public onlyAdmin returns (bool success) {
-	
-	bytes32 uuid32 = stringToBytes32(_code);
-	
-	// weight posiitve & code not yet registered
-	require( _weight > 0 );
-	require( mCodeIndexPlus[uuid32] == 0 );
-	
-	// add to end of array
-	uint idx = code.length;
-	code[idx] = uuid32;
-	weight[idx] = _weight;
-	mCodeIndexPlus[uuid32] = idx + 1;
-	
-	// update sum of weights
-	sumOfWeights = sumOfWeights.add(_weight);
-	
-	// register event and return
-	CodeUpdate(1, uuid32, _weight, sumOfWeights);
-	return true;
+
+    bytes32 uuid32 = stringToBytes32(_code);
+
+    // weight posiitve & code not yet registered
+    require( _weight > 0 );
+    require( mCodeIndexPlus[uuid32] == 0 );
+
+    // add to end of array
+    uint idx = code.length;
+    code[idx] = uuid32;
+    weight[idx] = _weight;
+    mCodeIndexPlus[uuid32] = idx + 1;
+
+    // update sum of weights
+    sumOfWeights = sumOfWeights.add(_weight);
+
+    // register event and return
+    CodeUpdate(1, uuid32, _weight, sumOfWeights);
+    return true;
   }
-	  
+  
   function updateCodeWeight(string _code, uint _weight) public onlyAdmin returns (bool success) {
 
     bytes32 uuid32 = stringToBytes32(_code);
 
-	// weight positive & code must be registered
-	require( _weight > 0 );
-	require( mCodeIndexPlus[uuid32] > 0 );
+    // weight positive & code must be registered
+    require( _weight > 0 );
+    require( mCodeIndexPlus[uuid32] > 0 );
 
     // update weight and sum of weights
-	uint idx = mCodeIndexPlus[uuid32] - 1;
+    uint idx = mCodeIndexPlus[uuid32] - 1;
     uint oldWeight = weight[idx];
-	weight[idx] = _weight;
-	sumOfWeights = sumOfWeights.sub(oldWeight).add(_weight);
-	
-	// register event and return
-	CodeUpdate(2, uuid32, _weight, sumOfWeights);
-	return true;
-  }	  
+    weight[idx] = _weight;
+    sumOfWeights = sumOfWeights.sub(oldWeight).add(_weight);
+
+    // register event and return
+    CodeUpdate(2, uuid32, _weight, sumOfWeights);
+    return true;
+  }
   
   function removeCode(string _code) public onlyAdmin returns (bool success) {
 
-	bytes32 uuid32 = stringToBytes32(_code);
-	
-	// code must be registered
-	require( mCodeIndexPlus[uuid32] > 0 );
-	
-	// index of code to be deleted
-	uint idx = mCodeIndexPlus[uuid32] - 1;
-	uint idxLast = code.length - 1;
+    bytes32 uuid32 = stringToBytes32(_code);
+
+    // code must be registered
+    require( mCodeIndexPlus[uuid32] > 0 );
+
+    // index of code to be deleted
+    uint idx = mCodeIndexPlus[uuid32] - 1;
+    uint idxLast = code.length - 1;
 
     // update sum of weights and remove mapping
-	sumOfWeights = sumOfWeights.sub(weight[idx]);
-	mCodeIndexPlus[uuid32] = 0;
-	
-	if (idx != idxLast) {
+    sumOfWeights = sumOfWeights.sub(weight[idx]);
+    mCodeIndexPlus[uuid32] = 0;
+
+    if (idx != idxLast) {
       // if we are not deleting the last element:
-	  // move last element to index of deleted element
-	  code[idx] = code[idxLast];
+      // move last element to index of deleted element
+      code[idx] = code[idxLast];
       weight[idx] = weight[idxLast];
-	  mCodeIndexPlus[code[idxLast]] = idx;
+      mCodeIndexPlus[code[idxLast]] = idx;
     }
-	// delete last element of arrays
+    // delete last element of arrays
     delete code[idxLast];
     delete weight[idxLast];
-	
-	// register event and return
-	CodeUpdate(3, uuid32, 0, sumOfWeights);
-	return true;
-  }	
+
+    // register event and return
+    CodeUpdate(3, uuid32, 0, sumOfWeights);
+    return true;
+  }
 
   /* Transfer out any accidentally sent ERC20 tokens */
 
