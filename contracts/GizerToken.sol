@@ -469,7 +469,7 @@ contract GizerToken is ERC20Token {
   
   function mintDirectly() public returns (uint idx, string uuid) {
     super.transfer(redemptionWallet, E6);
-	return mintItem(msg.sender);
+    return mintItem(msg.sender);
   }
   
   /* Admin mints item on GZR owner's behalf */
@@ -484,9 +484,9 @@ contract GizerToken is ERC20Token {
   
   function mintItem(address _owner) internal returns(uint idx, string uuid) {
     GizerItemsInterface g = GizerItemsInterface(gizerItemsContract);
-	bytes32 uuid32;
+    bytes32 uuid32;
     (idx, uuid32) = g.mint(_owner);
-	uuid = bytes32ToString(uuid32);
+    uuid = bytes32ToString(uuid32);
   }
   
   /* https://ethereum.stackexchange.com/questions/2519/how-to-convert-a-bytes32-to-string */
@@ -519,6 +519,6 @@ contract GizerToken is ERC20Token {
 
 contract GizerItemsInterface is Owned {
 
-  function mint(address _to) public onlyAdmin returns (uint idx, bytes32 uuint);
+  function mint(address _to) public onlyAdmin returns (uint idx, bytes32 uuid);
 
 }

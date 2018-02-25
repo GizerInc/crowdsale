@@ -287,8 +287,8 @@ contract GizerItems is ERC721Token {
   // Basic Functions ------------------
   
   function GizerItems() public {
-	// load initial codes
-	addCode("74143b3842ff373eb111d12f1f497611,  500);
+    // load initial codes
+    addCode("74143b3842ff373eb111d12f1f497611,  500);
     addCode("564b40b09a8239fbbe400e9120b85386, 1120);
     addCode("457c0757d4bc3452853f9b3f48b70899,  500);
     addCode("785ddae3685c3c58bba1566c245e5c72, 1120);
@@ -385,7 +385,7 @@ contract GizerItems is ERC721Token {
     ));
   }
   
-  // uuint functions ------------------
+  // uuid functions -------------------
   
   function addCode(string _code, uint _weight) public onlyAdmin returns (bool success) {
 
