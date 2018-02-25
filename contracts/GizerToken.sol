@@ -46,37 +46,53 @@ contract Owned {
   address public owner;
   address public newOwner;
 
+  mapping(address => bool) public isAdmin;
+
   // Events ---------------------------
 
   event OwnershipTransferProposed(address indexed _from, address indexed _to);
-  event OwnershipTransferred(address indexed _to);
+  event OwnershipTransferred(address indexed _from, address indexed _to);
+  
+  event AdminChange(address indexed _admin, bool _status);
 
-  // Modifier -------------------------
+  // Modifiers ------------------------
 
-  modifier onlyOwner {
-    require( msg.sender == owner );
-    _;
-  }
+  modifier onlyOwner { require( msg.sender == owner ); _; }
+  
+  modifier onlyAdmin { require( isAdmin[msg.sender] ); _; }
 
   // Functions ------------------------
 
   function Owned() public {
     owner = msg.sender;
+	isAdmin[owner] = true;
   }
 
   function transferOwnership(address _newOwner) public onlyOwner {
     require( _newOwner != owner );
     require( _newOwner != address(0x0) );
-    newOwner = _newOwner;
     OwnershipTransferProposed(owner, _newOwner);
+    newOwner = _newOwner;
   }
 
   function acceptOwnership() public {
-    require( msg.sender == newOwner );
+    require(msg.sender == newOwner);
+    OwnershipTransferred(owner, newOwner);
     owner = newOwner;
-    OwnershipTransferred(owner);
+  }
+  
+  function addAdmin(address _a) public onlyOwner {
+    require( isAdmin[_a] == false );
+	isAdmin[_a] = true;
+	AdminChange(_a, true);
   }
 
+  function removeAdmin(address _a) public onlyOwner {
+    require( isAdmin[_a] == true );
+	isAdmin[_a] = false;
+	AdminChange(_a, false);
+  }
+  
 }
 
 
@@ -213,6 +229,7 @@ contract GizerToken is ERC20Token {
   
   address public wallet;
   address public redemptionWallet;
+  address public gizerItemsContract;
 
   /* Crowdsale parameters (constants) */
 
@@ -249,6 +266,7 @@ contract GizerToken is ERC20Token {
   // Events ---------------------------
   
   event WalletUpdated(address _newWallet);
+  event GizerItemsContractUpdated(address _GizerItemsContract);
   event RedemptionWalletUpdated(address _newRedemptionWallet);
   event EthCentsUpdated(uint _cents);
   event TokensIssuedCrowd(address indexed _recipient, uint _tokens, uint _ether);
@@ -321,6 +339,14 @@ contract GizerToken is ERC20Token {
     require( _wallet != address(0x0) );
     redemptionWallet = _wallet;
     RedemptionWalletUpdated(_wallet);
+  }
+  
+  /* Change the redemption wallet address */
+
+  function setGizerItemsContract(address _contract) public onlyOwner {
+    require( _contract != address(0x0) );
+    gizerItemsContract = _contract;
+    GizerItemsContractUpdated(_contract);
   }
   
   /* Minting of tokens by owner */
@@ -438,6 +464,43 @@ contract GizerToken is ERC20Token {
     for (i = 0; i < _addresses.length; i++) {
       super.transfer(_addresses[i], _amounts[i]);
     }
+  }
+  
+  // Functions to convert GZR to Gizer items -----------
+  
+  /* GZR token owner buys Item directly */ 
+  
+  function mintDirectly() public returns (uint idx, bytes32 uuid) {
+    super.transfer(redemptionWallet, E6);
+	return mintItem(msg.sender);
+  }
+  
+  /* Admin mints item on GZR owner's behalf */
+  /* (requires previous approve) */  
+  
+  function mintByAdmin(address _owner) public onlyAdmin returns (uint idx, bytes32 uuid) {
+    super.transferFrom(_owner, redemptionWallet, E6);
+    return mintItem(_owner);
+  }
+  
+  /* Internal function to call */
+  
+  function mintItem(address _owner) internal returns(uint idx, bytes32 uuid) {
+    GizerItemsInterface g = GizerItemsInterface(gizerItemsContract);
+	return g.mint(_owner);
   }  
   
+}
+
+
+// ----------------------------------------------------------------------------
+//
+// GZR Items interface
+//
+// ----------------------------------------------------------------------------
+
+contract GizerItemsInterface is Owned {
+
+  function mint(address _to) public onlyAdmin returns (uint idx, bytes32 uuint);
+
 }
