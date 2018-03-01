@@ -288,23 +288,25 @@ contract GizerItems is ERC721Token {
   
   function GizerItems() public {
     // load initial codes
-    addCode("74143b3842ff373eb111d12f1f497611,  500);
-    addCode("564b40b09a8239fbbe400e9120b85386, 1120);
-    addCode("457c0757d4bc3452853f9b3f48b70899,  500);
-    addCode("785ddae3685c3c58bba1566c245e5c72, 1120);
-    addCode("28a41f370fcc3b57b854ddd6529b8028, 1120);
-    addCode("c1e8314b14dc3ec984b9409da3219371, 1300);
-    addCode("eaba91e8e2ce35609c0f5ac992987af8, 1300);
-    addCode("48ddee5a71e63d31aafb99adcaa54ed1, 1120);
-    addCode("43db1b25e3a13e958eb7346e6f7b69b5, 1300);
-    addCode("47e457e721d43d85ab974a0ec3a135a9, 1300);
-    addCode("eea5776e85a73e398ae4f030949ac4b4, 1300);
-    addCode("0a10e405769d3fd983a70cc3f6a8ac17, 1300);
-    addCode("6ed505f443dd3f1fb834ce482fcf15d2,  500);
-    addCode("8f7690bbb3053f4ba8548d97cf89c852,  400);
-    addCode("69a1dc553de83504aabdb6858f4923d3, 1300);
-    addCode("b51f0d6813a73ccb9c9bd741118d622b, 1300);
-    addCode("70a34eb62d3234689bd56643cdfb514f,  400);
+	// these will not be included when deploying to private
+	// to keep the code clean
+    addCode("74143b3842ff373eb111d12f1f497611",  500);
+    addCode("564b40b09a8239fbbe400e9120b85386", 1120);
+    addCode("457c0757d4bc3452853f9b3f48b70899",  500);
+    addCode("785ddae3685c3c58bba1566c245e5c72", 1120);
+    addCode("28a41f370fcc3b57b854ddd6529b8028", 1120);
+    addCode("c1e8314b14dc3ec984b9409da3219371", 1300);
+    addCode("eaba91e8e2ce35609c0f5ac992987af8", 1300);
+    addCode("48ddee5a71e63d31aafb99adcaa54ed1", 1120);
+    addCode("43db1b25e3a13e958eb7346e6f7b69b5", 1300);
+    addCode("47e457e721d43d85ab974a0ec3a135a9", 1300);
+    addCode("eea5776e85a73e398ae4f030949ac4b4", 1300);
+    addCode("0a10e405769d3fd983a70cc3f6a8ac17", 1300);
+    addCode("6ed505f443dd3f1fb834ce482fcf15d2",  500);
+    addCode("8f7690bbb3053f4ba8548d97cf89c852",  400);
+    addCode("69a1dc553de83504aabdb6858f4923d3", 1300);
+    addCode("b51f0d6813a73ccb9c9bd741118d622b", 1300);
+    addCode("70a34eb62d3234689bd56643cdfb514f",  400);
   }
   
   function () public payable { revert(); }
