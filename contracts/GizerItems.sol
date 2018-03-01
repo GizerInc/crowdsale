@@ -287,9 +287,10 @@ contract GizerItems is ERC721Token {
   // Basic Functions ------------------
   
   function GizerItems() public {
-    // load initial codes
-	// these will not be included when deploying to private
-	// to keep the code clean
+    //
+    // load initial codes - to keep the code short and clean,
+    // these will not be included when deploying to prod
+    // 
     addCode("74143b3842ff373eb111d12f1f497611",  500);
     addCode("564b40b09a8239fbbe400e9120b85386", 1120);
     addCode("457c0757d4bc3452853f9b3f48b70899",  500);
