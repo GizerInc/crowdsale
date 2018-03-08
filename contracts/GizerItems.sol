@@ -90,21 +90,10 @@ contract Owned {
   
 }
 
-// ----------------------------------------------------------------------------
-//
-// ERC165 Interface 
-//
-// ----------------------------------------------------------------------------
-
-interface ERC165 {
-  function supportsInterface(bytes4 interfaceID) external view returns (bool);
-}
-
-
 
 // ----------------------------------------------------------------------------
 //
-// ERC721 Token Interface 
+// ERC721(ish) Token Interface 
 //
 // ----------------------------------------------------------------------------
 
@@ -137,6 +126,7 @@ interface ERC721Enumerable /* is ERC721 */ {
     // function ownerByIndex(uint256 _index) external view returns (address _owner);
     // function deedOfOwnerByIndex(address _owner, uint256 _index) external view returns (uint256 _deedId);
 }
+
 
 // ----------------------------------------------------------------------------
 //
@@ -175,7 +165,7 @@ contract ERC721Token is ERC721Interface, ERC721Metadata, ERC721Enumerable, Owned
   function transfer(address _to, uint _id) external {
     // check ownership and address
     require( msg.sender == mIdOwner[_id] );
-	require( _to != address(0x0) );
+    require( _to != address(0x0) );
 
     // transfer ownership
     mIdOwner[_id] = _to;
@@ -288,8 +278,7 @@ contract GizerItems is ERC721Token {
   
   function GizerItems() public {
     //
-    // load initial codes - to keep the code short and clean,
-    // these will not be included when deploying to prod
+    // load initial codes
     // 
     addCode("74143b3842ff373eb111d12f1f497611",  500);
     addCode("564b40b09a8239fbbe400e9120b85386", 1120);
@@ -320,7 +309,7 @@ contract GizerItems is ERC721Token {
   
   function symbol() external pure returns (string) {
     return cSymbol;
-  }	
+  }
   
   function deedUri(uint _id) external view returns (string) {
     return bytes32ToString(mIdxIUuid[_id]);
@@ -328,12 +317,12 @@ contract GizerItems is ERC721Token {
   
   function getUuid(uint _id) external view returns (string) {
     require( _id < code.length );
-	return bytes32ToString(code[_id]);  
+    return bytes32ToString(code[_id]);  
   }
 
   // Token Minting --------------------
   
-  function mint(address _to) public onlyAdmin returns (uint idx, bytes32 uuid32) {
+  function mint(address _to) public onlyAdmin returns (uint idx) {
     
     // initial checks
     require( sumOfWeights > 0 );
@@ -341,7 +330,7 @@ contract GizerItems is ERC721Token {
     require( _to != address(this) );
 
     // get random uuid
-    uuid32 = getRandomUuid();
+    bytes32 uuid32 = getRandomUuid();
 
     // mint token
     deedCount++;
@@ -354,9 +343,7 @@ contract GizerItems is ERC721Token {
 
     // log event and return
     MintToken(msg.sender, _to, uuid32, idx);
-    return(idx, uuid32);
   }
-  
   
   // Random
   
@@ -390,12 +377,14 @@ contract GizerItems is ERC721Token {
   
   // uuid functions -------------------
   
+  /* add a new code + weight */
+  
   function addCode(string _code, uint _weight) public onlyAdmin returns (bool success) {
 
     bytes32 uuid32 = stringToBytes32(_code);
 
     // weight posiitve & code not yet registered
-	require( _weight > 0 );
+    require( _weight > 0 );
     require( mCodeIndexPlus[uuid32] == 0 );
 
     // add to end of array
@@ -411,6 +400,8 @@ contract GizerItems is ERC721Token {
     CodeUpdate(1, uuid32, _weight, sumOfWeights);
     return true;
   }
+  
+  /* update the weight of an existing code */
   
   function updateCodeWeight(string _code, uint _weight) public onlyAdmin returns (bool success) {
 
@@ -430,6 +421,8 @@ contract GizerItems is ERC721Token {
     CodeUpdate(2, uuid32, _weight, sumOfWeights);
     return true;
   }
+  
+  /* remove an existing code */
   
   function removeCode(string _code) public onlyAdmin returns (bool success) {
 
@@ -455,9 +448,9 @@ contract GizerItems is ERC721Token {
     }
     // delete last element of arrays
     delete code[idxLast];
-	code.length--;
+    code.length--;
     delete weight[idxLast];
-	weight.length--;
+    weight.length--;
 
     // register event and return
     CodeUpdate(3, uuid32, 0, sumOfWeights);

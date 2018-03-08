@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.20;
 
 // ----------------------------------------------------------------------------
 //
@@ -230,8 +230,8 @@ contract GizerToken is ERC20Token {
 
   /* Crowdsale parameters (constants) */
 
-  uint public constant DATE_ICO_START = 1518962400; // 18-Feb-2018 14:00 UTC 09:00 EST
-  uint public constant DATE_ICO_END   = 1521122400; // 15-Mar-2018 14:00 UTC 10:00 EST
+  uint public constant DATE_ICO_START = 1521122400; // 15-Mar-2018 14:00 UTC 10:00 EST
+  uint public constant DATE_ICO_END   = 1523368800; // 10-Apr-2018 14:00 UTC 10:00 EST
 
   uint public constant TOKEN_SUPPLY_TOTAL = 10000000 * E6;
   uint public constant TOKEN_SUPPLY_CROWD =  6112926 * E6;
@@ -242,7 +242,7 @@ contract GizerToken is ERC20Token {
   
   uint public constant TOKENS_PER_ETH = 1000;
   
-  uint public constant DATE_TOKENS_UNLOCKED = 1537020000; // 15-SEP-2018 14:00 UTC 10:00 EST
+  uint public constant DATE_TOKENS_UNLOCKED = 1539180000; // 10-OCT-2018 14:00 UTC 10:00 EST
   
   /* Crowdsale variables */
 
@@ -268,6 +268,7 @@ contract GizerToken is ERC20Token {
   event EthCentsUpdated(uint _cents);
   event TokensIssuedCrowd(address indexed _recipient, uint _tokens, uint _ether);
   event TokensIssuedOwner(address indexed _recipient, uint _tokens, bool _locked);
+  event ItemsBought(address indexed _recipient, uint _lastIdx, uint _number);
 
   // Basic Functions ------------------
 
@@ -465,47 +466,40 @@ contract GizerToken is ERC20Token {
   
   // Functions to convert GZR to Gizer items -----------
   
-  /* GZR token owner buys Item directly */ 
+  /* GZR token owner buys one Gizer Item */ 
   
-  function mintDirectly() public returns (uint idx, string uuid) {
+  function buyItem() public returns (uint idx) {
     super.transfer(redemptionWallet, E6);
-    return mintItem(msg.sender);
+    idx = mintItem(msg.sender);
+
+    // event
+    ItemsBought(msg.sender, idx, 1);
   }
   
-  /* Admin mints item on GZR owner's behalf */
-  /* (requires previous approve) */  
+  /* GZR token owner buys several Gizer Items (max 100) */ 
   
-  function mintByAdmin(address _owner) public onlyAdmin returns (uint idx, string uuid) {
-    super.transferFrom(_owner, redemptionWallet, E6);
-    return mintItem(_owner);
+  function buyMultipleItems(uint8 _items) public returns (uint idx) {
+    
+    // between 0 and 100 items
+    require( _items > 0 && _items <= 100 );
+
+    // transfer GZR tokens to redemption wallet
+    super.transfer(redemptionWallet, _items * E6);
+    
+    // mint tokens, returning indexes of first and last item minted
+    for (uint i = 0; i < _items; i++) {
+      idx = mintItem(msg.sender);
+    }
+
+    // event
+    ItemsBought(msg.sender, idx, _items);
   }
-  
+
   /* Internal function to call */
   
-  function mintItem(address _owner) internal returns(uint idx, string uuid) {
+  function mintItem(address _owner) internal returns(uint idx) {
     GizerItemsInterface g = GizerItemsInterface(gizerItemsContract);
-    bytes32 uuid32;
-    (idx, uuid32) = g.mint(_owner);
-    uuid = bytes32ToString(uuid32);
-  }
-  
-  /* https://ethereum.stackexchange.com/questions/2519/how-to-convert-a-bytes32-to-string */
-
-  function bytes32ToString(bytes32 x) public pure returns (string) {
-    bytes memory bytesString = new bytes(32);
-    uint charCount = 0;
-    for (uint j = 0; j < 32; j++) {
-      byte char = byte(bytes32(uint(x) * 2 ** (8 * j)));
-      if (char != 0) {
-        bytesString[charCount] = char;
-        charCount++;
-      }
-    }
-    bytes memory bytesStringTrimmed = new bytes(charCount);
-    for (j = 0; j < charCount; j++) {
-      bytesStringTrimmed[j] = bytesString[j];
-    }
-    return string(bytesStringTrimmed);
+    idx = g.mint(_owner);
   }
   
 }
@@ -519,6 +513,6 @@ contract GizerToken is ERC20Token {
 
 contract GizerItemsInterface is Owned {
 
-  function mint(address _to) public onlyAdmin returns (uint idx, bytes32 uuid);
+  function mint(address _to) public onlyAdmin returns (uint idx);
 
 }
