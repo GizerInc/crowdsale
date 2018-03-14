@@ -231,7 +231,6 @@ contract GizerToken is ERC20Token {
   /* Crowdsale parameters (constants) */
 
   uint public constant DATE_ICO_START = 1521122400; // 15-Mar-2018 14:00 UTC 10:00 EST
-  uint public constant DATE_ICO_END   = 1523368800; // 10-Apr-2018 14:00 UTC 10:00 EST
 
   uint public constant TOKEN_SUPPLY_TOTAL = 10000000 * E6;
   uint public constant TOKEN_SUPPLY_CROWD =  6112926 * E6;
@@ -243,7 +242,11 @@ contract GizerToken is ERC20Token {
   uint public constant TOKENS_PER_ETH = 1000;
   
   uint public constant DATE_TOKENS_UNLOCKED = 1539180000; // 10-OCT-2018 14:00 UTC 10:00 EST
+
+  /* Crowdsale parameters (can be modified by owner) */
   
+  uint public date_ico_end = 1523368800; // 10-Apr-2018 14:00 UTC 10:00 EST
+
   /* Crowdsale variables */
 
   uint public tokensIssuedCrowd  = 0;
@@ -265,7 +268,7 @@ contract GizerToken is ERC20Token {
   event WalletUpdated(address _newWallet);
   event GizerItemsContractUpdated(address _GizerItemsContract);
   event RedemptionWalletUpdated(address _newRedemptionWallet);
-  event EthCentsUpdated(uint _cents);
+  event DateIcoEndUpdated(uint _unixts);
   event TokensIssuedCrowd(address indexed _recipient, uint _tokens, uint _ether);
   event TokensIssuedOwner(address indexed _recipient, uint _tokens, bool _locked);
   event ItemsBought(address indexed _recipient, uint _lastIdx, uint _number);
@@ -297,14 +300,14 @@ contract GizerToken is ERC20Token {
   /* Are tokens tradeable */
   
   function tradeable() public view returns (bool) {
-    if (atNow() > DATE_ICO_END) return true ;
+    if (atNow() > date_ico_end) return true ;
     return false;
   }
   
   /* Available to mint by owner */
   
   function availableToMint() public view returns (uint available) {
-    if (atNow() <= DATE_ICO_END) {
+    if (atNow() <= date_ico_end) {
       available = TOKEN_SUPPLY_OWNER.sub(tokensIssuedOwner);
     } else {
       available = TOKEN_SUPPLY_TOTAL.sub(tokensIssuedTotal);
@@ -339,12 +342,21 @@ contract GizerToken is ERC20Token {
     RedemptionWalletUpdated(_wallet);
   }
   
-  /* Change the redemption wallet address */
+  /* Change the Gizer Items contract address */
 
   function setGizerItemsContract(address _contract) public onlyOwner {
     require( _contract != address(0x0) );
     gizerItemsContract = _contract;
     GizerItemsContractUpdated(_contract);
+  }
+  
+  /* Change the ICO end date */
+
+  function extendIco(uint _unixts) public onlyOwner {
+    require( _unixts > date_ico_end );
+    require( _unixts < 1530316800 ); // must be before 30-JUN-2018
+    date_ico_end = _unixts;
+    DateIcoEndUpdated(_unixts);
   }
   
   /* Minting of tokens by owner */
@@ -394,7 +406,7 @@ contract GizerToken is ERC20Token {
   function buyTokens() private {
     
     // basic checks
-    require( atNow() > DATE_ICO_START && atNow() < DATE_ICO_END );
+    require( atNow() > DATE_ICO_START && atNow() < date_ico_end );
     require( msg.value >= MIN_CONTRIBUTION );
     
     // check token volume
@@ -449,11 +461,9 @@ contract GizerToken is ERC20Token {
     require( _addresses.length == _amounts.length );
     require( _addresses.length <= 100 );
     
-    uint i;
-    
     // check token amounts
     uint tokens_to_transfer = 0;
-    for (i = 0; i < _addresses.length; i++) {
+    for (uint i = 0; i < _addresses.length; i++) {
       tokens_to_transfer = tokens_to_transfer.add(_amounts[i]);
     }
     require( tokens_to_transfer <= unlockedTokens(msg.sender) );
