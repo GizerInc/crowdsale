@@ -266,7 +266,7 @@ contract GizerItems is ERC721Token {
   
   /* mapping from item index to uuid */
   
-  mapping(uint => bytes32) mIdxIUuid;
+  mapping(uint => bytes32) public mIdxUuid;
   
   // Events ---------------------------
   
@@ -291,7 +291,7 @@ contract GizerItems is ERC721Token {
   }
   
   function deedUri(uint _id) external view returns (string) {
-    return bytes32ToString(mIdxIUuid[_id]);
+    return bytes32ToString(mIdxUuid[_id]);
   }
   
   function getUuid(uint _id) external view returns (string) {
@@ -314,7 +314,7 @@ contract GizerItems is ERC721Token {
     // mint token
     deedCount++;
     idx = deedCount;
-    mIdxIUuid[idx] = uuid32;
+    mIdxUuid[idx] = uuid32;
 
     // update balance and owner count
     updateBalances(address(0x0), _to);
