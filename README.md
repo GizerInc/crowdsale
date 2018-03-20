@@ -7,7 +7,7 @@ Users can collect items for rank, statistics, and customize their avatars to gai
 For more information, visit https://tokensale.gizer.io/
 
 
-## 25-Feb-2018: deployment notes for new contracts
+## Feb-25-2018: deployment notes for new contracts
 
 The address of contract GZR (GizerToken.sol) must be added to the list of admins of the GZR721 (GizerItems.sol) contract.
 
@@ -20,7 +20,7 @@ To do:
 [ ] check if bulk minting is desirable  
 
 
-## Tests of crowdsale contract
+## Tests of ERC20 contract
 
 Testing of the crowdsale contract was completed on Feb-12-2018, the results can be seen at:
 
