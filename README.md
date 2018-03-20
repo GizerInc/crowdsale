@@ -1,6 +1,6 @@
 # Gizer Token
 
-The GZR token represents a building block to a user’s profile on the Ethereum network. Each token represents an unlockable profile item in an "unknown" state. The user can unlock tokens at any time, resulting in a randomized profile item being unlocked which can be applied to the user’s Global Gaming Identity. The rarity and type of the item is completely random and decided only after the user decides to unlock it.
+The GZR token represents a building block to a user’s profile on the Ethereum network. Each token represents an unlockable profile item in an "unknown" state. The user can unlock tokens at any time, resulting in a randomized profile item being unlocked which can be applied to the user’s Global Gaming Identity. The rarity of each item is a set probability. 
 
 Users can collect items for rank, statistics, and customize their avatars to gain prestige within the community. As our network grows, we will encourage game developers and other applications to leverage our Global Gaming Identity.
 
@@ -15,14 +15,14 @@ The address used to call mintByAdmin() in GZR must be added to the list of admin
 
 To do:
 
-[ ] much more tetsing 
+[ ] much more testing 
 
 [ ] check if bulk minting is desirable  
 
 
 ## Tests of crowdsale contract
 
-Testing of the crowdsale contract was completed on 12-Feb-2018, the results can be seen at:
+Testing of the crowdsale contract was completed on Feb-12-2018, the results can be seen at:
 
 https://github.com/GizerInc/crowdsale/tree/master/dev-tests-2018-02
 
